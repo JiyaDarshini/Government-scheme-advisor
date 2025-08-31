@@ -5,10 +5,12 @@ from babel.dates import format_date
 
 api_bp = Blueprint('api', __name__)
 
+
 def translate_scheme(scheme, lang='en'):
     t = next((tr for tr in scheme.translations if tr.lang == lang), None)
     if not t:
         t = next((tr for tr in scheme.translations if tr.lang == 'en'), None)
+    translations = [{'lang': tr.lang, 'title': tr.title, 'short_desc': tr.short_desc} for tr in scheme.translations]
     return {
         'id': scheme.id,
         'code': scheme.code,
@@ -20,10 +22,10 @@ def translate_scheme(scheme, lang='en'):
         'states_applicable': scheme.states_applicable,
         'start_date': format_date(scheme.start_date, locale=lang) if scheme.start_date else None,
         'end_date': format_date(scheme.end_date, locale=lang) if scheme.end_date else None,
-        'official_url': scheme.official_url
+        'official_url': scheme.official_url,
+        'translations': translations
     }
 
-@api_bp.route('/schemes', methods=['GET'])
 def list_schemes():
     q = request.args.get('q','').strip()
     lang = request.args.get('lang','en')
